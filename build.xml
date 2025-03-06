@@ -1,0 +1,65 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project name="AntProject" default="build" basedir=".">
+    
+    <!-- Define properties -->
+    <property name="src.dir" value="src"/>
+    <property name="bin.dir" value="bin"/>
+    <property name="dist.dir" value="dist"/>
+    <property name="jar.name" value="HelloWorld.jar"/>
+
+    <!-- Initialize: Create necessary directories -->
+    <target name="init">
+        <mkdir dir="${src.dir}"/>
+        <mkdir dir="${bin.dir}"/>
+        <mkdir dir="${dist.dir}"/>
+    </target>
+
+    <!-- Clean previous builds -->
+    <target name="clean">
+        <echo message="Cleaning old files..."/>
+        <delete dir="${bin.dir}"/>
+        <delete dir="${dist.dir}"/>
+        <mkdir dir="${bin.dir}"/>
+        <mkdir dir="${dist.dir}"/>
+    </target>
+    
+    <!-- Compile Java files -->
+    <target name="compile" depends="init,clean">
+        <javac srcdir="${src.dir}" destdir="${bin.dir}"/>
+        <echo message="Compilation complete!"/>
+    </target>
+
+    <!-- Create JAR file -->
+    <target name="jar" depends="compile">
+        <mkdir dir="${dist.dir}"/>
+
+        <jar destfile="${dist.dir}/${jar.name}">
+            <fileset dir="${bin.dir}"/>
+            <manifest>
+                <attribute name="Main-Class" value="HelloWorld"/>
+            </manifest>
+        </jar>
+
+        <echo message="JAR file created successfully: ${dist.dir}/${jar.name}"/>
+    </target>
+
+    <!-- Package into TAR.GZ -->
+    <target name="tar-gz" depends="jar">
+        <mkdir dir="${dist.dir}"/>
+
+        <tar destfile="${dist.dir}/HelloWorld.tar">
+            <tarfileset dir="${dist.dir}" includes="*.jar"/>
+        </tar>
+
+        <gzip src="${dist.dir}/HelloWorld.tar" zipfile="${dist.dir}/HelloWorld.tar.gz"/>
+        <delete file="${dist.dir}/HelloWorld.tar"/>
+        
+        <echo message="TAR.GZ package created successfully: ${dist.dir}/HelloWorld.tar.gz"/>
+    </target>
+
+    <!-- Full build pipeline -->
+    <target name="build" depends="tar-gz">
+        <echo message="✅ Build complete! JAR and TAR.GZ are ready in ${dist.dir}"/>
+    </target>
+
+</project>
